@@ -40,3 +40,5 @@ async def lights():
     print(dev.alias)
 
 #https://python-kasa.readthedocs.io/en/latest/guides/light.html FOR TOMORROW
+
+# TODO: Why is dev.modules NIL
