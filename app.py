@@ -1,8 +1,28 @@
 from flask import Flask
 from kasa import Discover, Module, Device
 import requests
+import random
+import time
+from playsound import playsound
 
 app = Flask(__name__)
+
+@app.route("/flicker")
+async def flickerLights():
+    dev = await configureKasaLights()
+    await dev.turn_on()
+    await dev.update()
+    light = dev.modules[Module.Light]
+    for flicker in [0,50,100,0,100,0,100,0,50,100]:
+#        OPTION 1
+#        time.sleep(random.uniform(0, 0.4))
+        await light.set_brightness(flicker)
+        
+#        OPTION 2
+#        await dev.turn_on()
+#        await dev.turn_off()
+    await dev.update()
+    return "<p>FLICKERED!</p>"
 
 @app.route("/white")
 async def turnLightWhite():
@@ -55,6 +75,18 @@ async def turnPlugOff():
     print(response)
     return "<p>PLUG OFF!</p>"
 
+@app.route("/horror_tease")
+async def triggerHorrorTease():
+    playsound('long_sweep.wav') # this clip is causing the below methods to wait. i want the sound to continue playing
+    await turnPlugOn()
+    await turnLightRed()
+    time.sleep(2.5)
+    await turnPlugOff()
+    await turnLightWhite()
+    return "<p>HORROR TEASED!</p>"
+
 #https://python-kasa.readthedocs.io/en/latest/guides/light.html FOR TOMORROW
 
 # TODO: Why is dev.modules NIL
+
+# TODO: Consolidate use of Device across app
