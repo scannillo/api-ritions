@@ -1,11 +1,11 @@
 from flask import Flask
-from kasa import Discover, Module
+from kasa import Discover, Module, Device
 
 app = Flask(__name__)
 
 @app.route("/white")
 async def turnLightWhite():
-    dev = await Discover.discover_single("192.168.0.137",username="sammyjaynecannillo@gmail.com",password="X35zjpenn123!")
+    dev = await configureKasaLights()
     await dev.turn_on()
     await dev.update()
     light = dev.modules[Module.Light]
@@ -16,7 +16,7 @@ async def turnLightWhite():
 
 @app.route("/red")
 async def turnLightRed():
-    dev = await Discover.discover_single("192.168.0.137",username="sammyjaynecannillo@gmail.com",password="X35zjpenn123!")
+    dev = await configureKasaLights())
     await dev.turn_on()
     await dev.update()
     light = dev.modules[Module.Light]
@@ -26,19 +26,23 @@ async def turnLightRed():
 
 @app.route("/light_off")
 async def turnLightOff():
-    dev = await Discover.discover_single("192.168.0.137",username="sammyjaynecannillo@gmail.com",password="X35zjpenn123!")
+    dev = await configureKasaLights()
     await dev.turn_off()
     await dev.update()
     return "<p>LIGHT OFF!</p>"
 
 @app.route("/light_on")
 async def turnLightOn():
-    dev = await Discover.discover_single("192.168.0.137",username="sammyjaynecannillo@gmail.com",password="X35zjpenn123!")
+    dev = await configureKasaLights()
     await dev.turn_on()
     await dev.update()
     print(dev.alias)
     print("Hello, world!")
     return "<p>LIGHT ON!</p>"
+    
+async def configureKasaLights() -> Device:
+    return await Discover.discover_single("192.168.0.137",username="sammyjaynecannillo@gmail.com",password="X35zjpenn123!")
+
 
 #https://python-kasa.readthedocs.io/en/latest/guides/light.html FOR TOMORROW
 
