@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from kasa import Discover, Module, Device
 import requests
 import random
@@ -45,13 +45,6 @@ async def turnLightRed():
     await dev.update()
     return "<p>RED!</p>"
 
-@app.route("/light_off")
-async def turnLightOff():
-    dev = await configureKasaLights()
-    await dev.turn_off()
-    await dev.update()
-    return "<p>LIGHT OFF!</p>"
-
 @app.route("/light_on")
 async def turnLightOn():
     dev = await configureKasaLights()
@@ -64,13 +57,11 @@ async def configureKasaLights() -> Device:
     # Why does host change?
     return await Discover.discover_single("192.168.0.136",username="sammyjaynecannillo@gmail.com",password="X35zjpenn123!")
 
-@app.route("/plug_on")
 async def turnPlugOn():
     response = requests.get("https://www.virtualsmarthome.xyz/url_routine_trigger/activate.php?trigger=c3d1918e-a61b-4a40-a85b-d660418bdd51&token=e09d2de6-c030-48a4-8574-2e9c39e9b6f1&response=json")
     print(response)
     return "<p>PLUG ON!</p>"
     
-@app.route("/plug_off")
 async def turnPlugOff():
     response = requests.get("https://www.virtualsmarthome.xyz/url_routine_trigger/activate.php?trigger=f4bec4e1-5283-4a1e-a12a-717be60dd5c6&token=be03fc96-1f23-48ef-ba07-16893e96f678&response=json ")
     print(response)
@@ -78,16 +69,30 @@ async def turnPlugOff():
 
 @app.route("/horror_tease")
 async def triggerHorrorTease():
+    length = request.args.get("length")
+
     mixer.init()
     mixer.music.load("long_sweep.wav")
 
+    print(length)
     await turnPlugOn()
     mixer.music.play()
     await turnLightRed() # if this fails, strobe doesn't turn off.
-    time.sleep(random.randint(2, 4))
+    if length:
+        print("123")
+        time.sleep(int(length))
+    else:
+        print("345")
+        time.sleep(random.randint(2, 5))
     await turnPlugOff()
     await turnLightWhite()
     return "<p>HORROR TEASED!</p>"
+    
+@app.route("/reset")
+async def reset():
+    await turnPlugOff()
+    await turnLightWhite()
+    return "<p>RESET!</p>"
     
 @app.route("/off_chime")
 async def triggerOffChime():
