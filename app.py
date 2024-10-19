@@ -80,10 +80,9 @@ async def turnPlugOff():
 async def triggerHorrorTease():
     mixer.init()
     mixer.music.load("long_sweep.wav")
-    mixer.music.set_volume(0.7)
-    mixer.music.play()
 
     await turnPlugOn()
+    mixer.music.play()
     await turnLightRed() # if this fails, strobe doesn't turn off.
     time.sleep(2.5)
     await turnPlugOff()
