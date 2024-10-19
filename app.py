@@ -3,7 +3,7 @@ from kasa import Discover, Module, Device
 import requests
 import random
 import time
-from playsound import playsound
+from pygame import mixer
 
 app = Flask(__name__)
 
@@ -61,7 +61,8 @@ async def turnLightOn():
     return "<p>LIGHT ON!</p>"
     
 async def configureKasaLights() -> Device:
-    return await Discover.discover_single("192.168.0.137",username="sammyjaynecannillo@gmail.com",password="X35zjpenn123!")
+    # Why does host change?
+    return await Discover.discover_single("192.168.0.136",username="sammyjaynecannillo@gmail.com",password="X35zjpenn123!")
 
 @app.route("/plug_on")
 async def turnPlugOn():
@@ -77,9 +78,13 @@ async def turnPlugOff():
 
 @app.route("/horror_tease")
 async def triggerHorrorTease():
-    playsound('long_sweep.wav') # this clip is causing the below methods to wait. i want the sound to continue playing
+    mixer.init()
+    mixer.music.load("long_sweep.wav")
+    mixer.music.set_volume(0.7)
+    mixer.music.play()
+
     await turnPlugOn()
-    await turnLightRed()
+    await turnLightRed() # if this fails, strobe doesn't turn off.
     time.sleep(2.5)
     await turnPlugOff()
     await turnLightWhite()
