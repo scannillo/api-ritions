@@ -1,5 +1,6 @@
 from flask import Flask
 from kasa import Discover, Module, Device
+import requests
 
 app = Flask(__name__)
 
@@ -16,7 +17,7 @@ async def turnLightWhite():
 
 @app.route("/red")
 async def turnLightRed():
-    dev = await configureKasaLights())
+    dev = await configureKasaLights()
     await dev.turn_on()
     await dev.update()
     light = dev.modules[Module.Light]
@@ -37,12 +38,22 @@ async def turnLightOn():
     await dev.turn_on()
     await dev.update()
     print(dev.alias)
-    print("Hello, world!")
     return "<p>LIGHT ON!</p>"
     
 async def configureKasaLights() -> Device:
     return await Discover.discover_single("192.168.0.137",username="sammyjaynecannillo@gmail.com",password="X35zjpenn123!")
 
+@app.route("/plug_on")
+async def turnPlugOn():
+    response = requests.get("https://www.virtualsmarthome.xyz/url_routine_trigger/activate.php?trigger=c3d1918e-a61b-4a40-a85b-d660418bdd51&token=e09d2de6-c030-48a4-8574-2e9c39e9b6f1&response=json")
+    print(response)
+    return "<p>PLUG ON!</p>"
+    
+@app.route("/plug_off")
+async def turnPlugOff():
+    response = requests.get("https://www.virtualsmarthome.xyz/url_routine_trigger/activate.php?trigger=f4bec4e1-5283-4a1e-a12a-717be60dd5c6&token=be03fc96-1f23-48ef-ba07-16893e96f678&response=json ")
+    print(response)
+    return "<p>PLUG OFF!</p>"
 
 #https://python-kasa.readthedocs.io/en/latest/guides/light.html FOR TOMORROW
 
