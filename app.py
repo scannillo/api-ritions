@@ -84,9 +84,26 @@ async def triggerHorrorTease():
     await turnPlugOn()
     mixer.music.play()
     await turnLightRed() # if this fails, strobe doesn't turn off.
-    time.sleep(2.5)
+    time.sleep(random.randint(2, 4))
     await turnPlugOff()
     await turnLightWhite()
+    return "<p>HORROR TEASED!</p>"
+    
+@app.route("/off_chime")
+async def triggerOffChime():
+    dev = await configureKasaLights()
+    await dev.turn_on()
+    await dev.update()
+    light = dev.modules[Module.Light]
+    
+    mixer.init()
+    mixer.music.load("chime_incorrect.wav")
+    mixer.music.play()
+    await light.set_brightness(0)
+    await dev.update()
+    time.sleep(1)
+    await light.set_brightness(100)
+    await dev.update
     return "<p>HORROR TEASED!</p>"
 
 #https://python-kasa.readthedocs.io/en/latest/guides/light.html FOR TOMORROW
