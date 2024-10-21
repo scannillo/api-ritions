@@ -26,36 +26,37 @@ async def flickerLights():
 
 @app.route("/white")
 async def turnLightWhite():
-    dev = await configureKasaLights()
-    await dev.turn_on()
-    await dev.update()
-    light = dev.modules[Module.Light]
-    await light.set_hsv(0, 0, 100)
-#    await light.set_color_temp(4500) consider warmer white
-    await dev.update()
+    devices = await configureKasaLights()
+    for dev in devices.values():
+        await dev.turn_on()
+        await dev.update()
+        light = dev.modules[Module.Light]
+        await light.set_hsv(0, 0, 100)
+    #    await light.set_color_temp(4500) consider warmer white
+        await dev.update()
     return "<p>WHITE!</p>"
 
 @app.route("/red")
 async def turnLightRed():
-    dev = await configureKasaLights()
-    await dev.turn_on()
-    await dev.update()
-    light = dev.modules[Module.Light]
-    await light.set_hsv(0, 100, 100)
-    await dev.update()
+    devices = await configureKasaLights()
+    print(devices)
+    for dev in devices.values():
+        await dev.turn_on()
+        await dev.update()
+        light = dev.modules[Module.Light]
+        await light.set_hsv(0, 100, 100)
+        await dev.update()
     return "<p>RED!</p>"
-
-@app.route("/light_on")
-async def turnLightOn():
-    dev = await configureKasaLights()
-    await dev.turn_on()
-    await dev.update()
-    print(dev.alias)
-    return "<p>LIGHT ON!</p>"
     
-async def configureKasaLights() -> Device:
+async def configureKasaLights() -> [Device]:
     # Why does host change?
-    return await Discover.discover_single("192.168.0.136",username="sammyjaynecannillo@gmail.com",password="X35zjpenn123!")
+#    return await Discover.discover(username="sammyjaynecannillo@gmail.com",password="X35zjpenn123!")
+    ip1 = "192.168.0.137"
+    light1 = await Discover.discover_single(ip1,username="sammyjaynecannillo@gmail.com",password="X35zjpenn123!")
+    
+    ip2 = "192.168.0.28"
+    light2 = await Discover.discover_single(ip2,username="sammyjaynecannillo@gmail.com",password="X35zjpenn123!")
+    return {ip1:light1, ip2:light2}
 
 async def turnPlugOn():
     response = requests.get("https://www.virtualsmarthome.xyz/url_routine_trigger/activate.php?trigger=c3d1918e-a61b-4a40-a85b-d660418bdd51&token=e09d2de6-c030-48a4-8574-2e9c39e9b6f1&response=json")
@@ -75,9 +76,9 @@ async def triggerHorrorTease():
     mixer.music.load("long_sweep.wav")
 
     print(length)
+    await turnLightRed() # if this fails, strobe doesn't turn off.
     await turnPlugOn()
     mixer.music.play()
-    await turnLightRed() # if this fails, strobe doesn't turn off.
     if length:
         print("123")
         time.sleep(int(length))
