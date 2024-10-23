@@ -62,8 +62,9 @@ shortAudioClips = {
     "audio/horns.mp3": 5,
     "audio/longsweep.wav": 5,
     "audio/scream_1.wav": 4,
+    "audio/scream_2.mp3": 6,
     "audio/stab.mp3": 5,
-    "audio/string_tension.mp3": 7
+    "audio/string_tension.mp3": 6
 }
 
 longAudioClips = {
