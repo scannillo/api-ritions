@@ -60,7 +60,7 @@ async def turnPlugOff():
     
 shortAudioClips = {
     "audio/horns.mp3": 5,
-    "audio/longsweep.wav": 5,
+    "audio/long_sweep.wav": 5,
     "audio/scream_1.wav": 4,
     "audio/scream_2.mp3": 6,
     "audio/stab.mp3": 5,
@@ -68,7 +68,7 @@ shortAudioClips = {
 }
 
 longAudioClips = {
-    "audio/hearbeat.mp3": 22,
+    "audio/heartbeat.mp3": 22,
     "audio/jumpscare.mp3": 19,
     "audio/psycho.mp3": 12,
     "audio/spotted.wav": 12
