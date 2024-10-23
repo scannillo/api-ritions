@@ -8,23 +8,6 @@ import playsound
 
 app = Flask(__name__)
 
-@app.route("/flicker")
-async def flickerLights():
-    dev = await configureKasaLights()
-    await dev.turn_on()
-    await dev.update()
-    light = dev.modules[Module.Light]
-    for flicker in [0,50,100,0,100,0,100,0,50,100]:
-#        OPTION 1
-#        time.sleep(random.uniform(0, 0.4))
-        await light.set_brightness(flicker)
-        
-#        OPTION 2
-#        await dev.turn_on()
-#        await dev.turn_off()
-    await dev.update()
-    return "<p>FLICKERED!</p>"
-
 @app.route("/white")
 async def turnLightWhite():
     devices = await configureKasaLights()
@@ -58,10 +41,10 @@ async def turnLightOff():
     
 async def configureKasaLights() -> [Device]:
 #    return await Discover.discover(username="sammyjaynecannillo@gmail.com",password="X35zjpenn123!")
-    ip1 = "192.168.0.137"
+    ip1 = "192.168.0.28"
     light1 = await Discover.discover_single(ip1,username="sammyjaynecannillo@gmail.com",password="X35zjpenn123!")
     
-    ip2 = "192.168.0.28"
+    ip2 = "192.168.0.136"
     light2 = await Discover.discover_single(ip2,username="sammyjaynecannillo@gmail.com",password="X35zjpenn123!")
     return {ip1:light1, ip2:light2}
 
@@ -74,49 +57,65 @@ async def turnPlugOff():
     response = requests.get("https://www.virtualsmarthome.xyz/url_routine_trigger/activate.php?trigger=f4bec4e1-5283-4a1e-a12a-717be60dd5c6&token=be03fc96-1f23-48ef-ba07-16893e96f678&response=json ")
     print(response)
     return "<p>PLUG OFF!</p>"
+    
+shortAudioClips = {
+    "audio/horns.mp3": 5,
+    "audio/longsweep.wav": 5,
+    "audio/scream_1.wav": 4,
+    "audio/stab.mp3": 5,
+    "audio/string_tension.mp3": 7
+}
+
+longAudioClips = {
+    "audio/hearbeat.mp3": 22,
+    "audio/jumpscare.mp3": 19,
+    "audio/psycho.mp3": 12,
+    "audio/spotted.wav": 12
+}
 
 @app.route("/horror_tease")
 async def triggerHorrorTease():
-    length = request.args.get("length")
+    allAudioClips = shortAudioClips | longAudioClips
+    randomClipTitle = random.choice(list(allAudioClips.keys()))
 
     mixer.init()
-    mixer.music.load("long_sweep.wav")
+    mixer.music.load(randomClipTitle)
 
-    await turnLightRed() # if this fails, strobe doesn't turn off.
-    await turnPlugOn()
+    await turnLightRed()
     mixer.music.play()
-    if length:
-        time.sleep(int(length))
-    else:
-        time.sleep(7)
+    await turnPlugOn()
+    time.sleep(allAudioClips[randomClipTitle])
     await turnPlugOff()
     await turnLightWhite()
     return "<p>HORROR TEASED!</p>"
     
 @app.route("/murder_tease")
 async def triggerMurderTease():
-    length = request.args.get("length")
-
+    randomClipTitle = random.choice(list(shortAudioClips.keys()))
+    
     mixer.init()
-    mixer.music.load("chime_incorrect.wav")
-    mixer.music.play()
-#    playsound.playsound("chime_incorrect.wav")
-    time.sleep(3)
-    await turnLightOff()
+    mixer.music.load(randomClipTitle)
+
     await turnPlugOn()
-    time.sleep(5)
+    mixer.music.play()
+
+    await turnLightOff()
+
+    time.sleep(shortAudioClips[randomClipTitle])
     await turnPlugOff()
     await turnLightWhite()
     return "<p>MURDER TEASED!</p>"
     
 @app.route("/baby_tease")
 async def triggerBabyTease():
-    mixer.init()
-    mixer.music.load("long_sweep.wav")
+    randomClipTitle = random.choice(list(longAudioClips.keys()))
 
-    await turnLightRed() # if this fails, strobe doesn't turn off.
+    mixer.init()
+    mixer.music.load(randomClipTitle)
+
+    await turnLightRed()
     mixer.music.play()
-    time.sleep(7)
+    time.sleep(longAudioClips[randomClipTitle])
     await turnLightWhite()
     return "<p>HORROR TEASED!</p>"
     
